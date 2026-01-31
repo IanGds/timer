@@ -5,82 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contagem Regressiva 25/06/2026</title>
     <style>
+        /* --- RESET BÁSICO --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Courier New', Courier, monospace; /* Fonte monoespaçada fica melhor para números */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #1a1a1a;
-            color: #00ffcc; /* Cor estilo "hacker/terminal" */
-            flex-direction: column;
-            margin: 0;
+            min-height: 100vh; /* Garante que ocupa a tela toda */
+            background-color: #121212;
+            color: #ffffff;
+            padding: 20px; /* Evita colar nas bordas em telas pequenas */
         }
+
         h2 {
             font-size: 2rem;
-            margin-bottom: 20px;
-            color: #fff;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
+
+        /* --- CONTAINER DO CONTADOR --- */
         #contador {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem linha se faltar espaço */
+            justify-content: center;
+            gap: 15px; /* Espaço entre os blocos */
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* --- BLOCOS DE TEMPO (Caixinhas) --- */
+        .bloco-tempo {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px; /* Tamanho mínimo de cada caixa */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            flex: 1; /* Faz os blocos crescerem igualmente */
+        }
+
+        .numero {
             font-size: 3rem;
             font-weight: bold;
-            background: #333;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            font-family: 'Courier New', Courier, monospace;
+            color: #fff;
+        }
+
+        .rotulo {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* --- MENSAGEM FINAL --- */
+        #mensagem-final {
+            display: none; /* Escondido por padrão */
+            font-size: 2rem;
+            color: #ff4444;
+            margin-top: 20px;
             text-align: center;
         }
-        .legenda {
-            font-size: 1rem;
-            color: #ccc;
-            margin-top: 10px;
+
+        /* --- MEDIA QUERIES (A Mágica da Responsividade) --- */
+        @media (max-width: 600px) {
+            /* Regras para celulares */
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .numero {
+                font-size: 2rem; /* Fonte menor no celular */
+            }
+
+            .bloco-tempo {
+                min-width: 40%; /* No celular, coloca 2 por linha */
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>GANDAIA ULTIMATE-EDITION</h1>
+
     <h2>Rumo a 25/06/2026</h2>
     
-    <div id="contador">Carregando...</div>
-    <div class="legenda">Dias : Horas : Minutos : Segundos</div>
+    <div id="contador">
+        <div class="bloco-tempo">
+            <span class="numero" id="dias">00</span>
+            <span class="rotulo">Dias</span>
+        </div>
+        <div class="bloco-tempo">
+            <span class="numero" id="horas">00</span>
+            <span class="rotulo">Horas</span>
+        </div>
+        <div class="bloco-tempo">
+            <span class="numero" id="minutos">00</span>
+            <span class="rotulo">Minutos</span>
+        </div>
+        <div class="bloco-tempo">
+            <span class="numero" id="segundos">00</span>
+            <span class="rotulo">Segundos</span>
+        </div>
+    </div>
+
+    <div id="mensagem-final">O GRANDE DIA CHEGOU!</div>
 
     <script>
-        // --- CONFIGURAÇÃO DA DATA ---
-        // Data alvo: 25 de Junho de 2026 às 00:00:00
         const dataAlvo = new Date("Jun 25, 2026 00:00:00").getTime();
 
-        // Atualiza a contagem a cada 1 segundo (1000ms)
         const x = setInterval(function() {
-
-            // Pega a data e hora atual
             const agora = new Date().getTime();
-
-            // Calcula a distância entre agora e a data alvo
             const distancia = dataAlvo - agora;
 
-            // Cálculos de tempo para dias, horas, minutos e segundos
             const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
             const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
             const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
 
-            // Formata para ter sempre 2 dígitos (ex: 09s em vez de 9s)
-            // Isso evita que o texto fique "pulando" na tela
-            const hFormatado = horas < 10 ? "0" + horas : horas;
-            const mFormatado = minutos < 10 ? "0" + minutos : minutos;
-            const sFormatado = segundos < 10 ? "0" + segundos : segundos;
+            // Atualiza cada elemento individualmente
+            // Usamos uma função auxiliar para colocar o zero na frente
+            document.getElementById("dias").innerText = dias; // Dias podem ter 3 digitos, não precisa do zero à esquerda
+            document.getElementById("horas").innerText = formatarTempo(horas);
+            document.getElementById("minutos").innerText = formatarTempo(minutos);
+            document.getElementById("segundos").innerText = formatarTempo(segundos);
 
-            // Exibe o resultado
-            document.getElementById("contador").innerHTML = 
-                `${dias} : ${hFormatado} : ${mFormatado} : ${sFormatado}`;
-
-            // Se a contagem terminar
             if (distancia < 0) {
                 clearInterval(x);
-                document.getElementById("contador").innerHTML = "CHEGOU O GRANDE DIA!";
-                document.getElementById("contador").style.color = "#ff4444"; // Muda cor para destaque
+                document.getElementById("contador").style.display = "none";
+                document.getElementById("mensagem-final").style.display = "block";
             }
         }, 1000);
+
+        // Função simples para adicionar o zero (ex: 5 vira 05)
+        function formatarTempo(tempo) {
+            return tempo < 10 ? `0${tempo}` : tempo;
+        }
     </script>
 
 </body>
